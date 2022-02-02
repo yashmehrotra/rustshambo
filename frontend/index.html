@@ -79,34 +79,24 @@ var app = new Vue({
       // Show progress bar
       this.progressVisible = true;
 
-      // Send data to backend
-      const resp = await fetch('http://localhost:8000/compute', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({'session_id': 100, 'hand': this.userHand})
+      Promise.all([
+        fetch('http://localhost:8000/compute', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({'session_id': 100, 'hand': this.userHand})
+        }),
+        new Promise(resolve => setTimeout(resolve, 1000))
+      ]).then(async (values) => {
+        const result = await values[0].json();
+        this.progressVisible = false;
+        console.log(result);
+        this.aiHand = this.capitalizeFirstLetter(result['ai_hand']);
+        // Hide progress bar
+        this.resultVisible = true;
       });
-
-      const result = await resp.json()
-      
+    
       // TODO: Error handling
       // if not 200, show error
-
-//    const vals = await Promise.allSettled([
-//        {await resp
-//         return resp.json()},
-//        new Promise(resolve => setTimeout(() => resolve(10000), 0)),
-//    ]).then(this.progressVisible = false);
-
-//    const resultUnused = vals[0].value;
-//    console.log(resultUnused);
-//    const result = resultUnused.json();
-//    console.log(result);
-
-      // TODO: Add Delay
-      this.progressVisible = false;
-      this.aiHand = this.capitalizeFirstLetter(result['ai_hand']);
-      // Hide progress bar
-      this.resultVisible = true;
     },
     capitalizeFirstLetter: function(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
