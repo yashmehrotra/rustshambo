@@ -4,11 +4,22 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
     <!--TODO: Use production vue.js-->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <!--TODO: Padding and prettify -->
     <style>
     :root {
       --primary: #3949ab;
-      --contrast: #e53935;
+    }
+
+    .container {
+      width: 800px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    h3 {
+      text-align: center;
     }
 
     .lose-button {
@@ -25,7 +36,8 @@
 </head>
 
 <body>
-<h1>Welcome to the unbeatable rock-paper-scissor bot</h1>
+<main class="container">
+<h1>Welcome to the  unbeatable rock&#x2011;paper&#x2011;scissor bot</h1>
 <div id="app">
     <div class="grid" id="user-input" v-if="inputVisible">
       <button v-on:click="choose" data-id="Rock">Rock</button>
@@ -39,7 +51,7 @@
     </div>
 
     <div id="result" v-if="resultVisible">
-        <h3>You lost :(</h3>
+        <h3>You lost :'(</h3>
 
         <div class="grid" id="result-grid">
             <button class="win-button"> You chose: {{ userHand }}</button>
@@ -48,6 +60,7 @@
         <button v-on:click="reset" class="secondary">Play again!</button>
     </div>
 </div>
+</main>
 
 <script>
 var app = new Vue({
@@ -72,10 +85,23 @@ var app = new Vue({
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({'session_id': 100, 'hand': this.userHand})
       });
+
+      const result = await resp.json()
       
       // TODO: Error handling
-      const result = await resp.json();
-      console.log(result);
+      // if not 200, show error
+
+//    const vals = await Promise.allSettled([
+//        {await resp
+//         return resp.json()},
+//        new Promise(resolve => setTimeout(() => resolve(10000), 0)),
+//    ]).then(this.progressVisible = false);
+
+//    const resultUnused = vals[0].value;
+//    console.log(resultUnused);
+//    const result = resultUnused.json();
+//    console.log(result);
+
       // TODO: Add Delay
       this.progressVisible = false;
       this.aiHand = this.capitalizeFirstLetter(result['ai_hand']);
