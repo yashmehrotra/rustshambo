@@ -2,6 +2,7 @@
 
 #![feature(proc_macro_hygiene, decl_macro)]
 use rocket;
+use chrono;
 
 use serde::Deserialize;
 use rocket_contrib::json;
@@ -31,6 +32,7 @@ fn compute(user_input: Json<UserInput>) -> JsonValue {
         _ => "invalid hand",
     };
 
+    println!("[{:?}] 200 - {}", chrono::offset::Local::now(), user_input.session_id);
     json!({"ai_hand": ai_hand})
 }
 

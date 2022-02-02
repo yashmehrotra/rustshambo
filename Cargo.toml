@@ -9,6 +9,7 @@ edition = "2021"
 rocket = "0.4.10"
 serde = { version = "1.0.136", features = ["derive"] }
 rocket_cors = "0.5.2"
+chrono = "0.4"
 
 [dependencies.rocket_contrib]
 version = "0.4.10"
