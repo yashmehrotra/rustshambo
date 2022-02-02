@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <!--TODO: Use production vue.js-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!--TODO: Padding and prettify -->
+    <style>
+    :root {
+      --primary: #3949ab;
+      --contrast: #e53935;
+    }
+
+    .lose-button {
+        background-color: #43a047;
+    }
+    
+    .win-button {
+        background-color: #e53935;
+    }
+      
+    </style>
+
+
+</head>
+
+<body>
+<h1>Welcome to the unbeatable rock-paper-scissor bot</h1>
+<div id="app">
+    <div class="grid" id="user-input" v-if="inputVisible">
+      <button v-on:click="choose" data-id="Rock">Rock</button>
+      <button v-on:click="choose" data-id="Paper">Paper</button>
+      <button v-on:click="choose" data-id="Scissor">Scissor</button>
+    </div>
+
+    <div id="progress" v-if="progressVisible">
+        <h3>Processing ...</h3>
+        <progress indeterminate="true"></progress>
+    </div>
+
+    <div id="result" v-if="resultVisible">
+        <h3>You lost :(</h3>
+
+        <div class="grid" id="result-grid">
+            <button class="win-button"> You chose: {{ userHand }}</button>
+            <button class="lose-button"> Bot chose: {{ aiHand }}</button>
+        </div>
+        <button v-on:click="reset" class="secondary">Play again!</button>
+    </div>
+</div>
+
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    inputVisible: true,
+    resultVisible: false,
+    progressVisible: false,
+    userHand: '',
+    aiHand: '',
+  },
+  methods: {
+    choose: async function() {
+      this.inputVisible = false;
+      this.userHand = event.target.getAttribute('data-id');
+      // Show progress bar
+      this.progressVisible = true;
+
+      // Send data to backend
+      const resp = await fetch('http://localhost:8000/compute', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({'session_id': 100, 'hand': this.userHand})
+      });
+      
+      // TODO: Error handling
+      const result = await resp.json();
+      console.log(result);
+      // TODO: Add Delay
+      this.progressVisible = false;
+      this.aiHand = this.capitalizeFirstLetter(result['ai_hand']);
+      // Hide progress bar
+      this.resultVisible = true;
+    },
+    capitalizeFirstLetter: function(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    reset: function() {
+      this.inputVisible = true;
+      this.resultVisible = false;
+      this.userHand = '';
+    },
+  },
+})
+</script>
+</body>
