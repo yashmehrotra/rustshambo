@@ -10,4 +10,4 @@ WORKDIR /app
 COPY . .
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD [ "http-server", "." ]

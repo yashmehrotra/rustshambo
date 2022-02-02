@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Rock Paper Scissor</title>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-    <!--TODO: Use production vue.js-->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script async defer data-website-id="eee76fe0-126e-4269-9014-037a3e9c4752" src="https://umami.yashmehrotra.com/umami.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <style>
     :root {
       --primary: #3949ab;
@@ -24,10 +25,21 @@
 
     .lose-button {
         background-color: #43a047;
+        cursor: default;
     }
     
     .win-button {
         background-color: #e53935;
+        cursor: default;
+    }
+
+    footer {
+      position:absolute;
+      text-align: center;
+      left: 0;
+      bottom: 0;
+      height: 60px;
+      width: 100%;
     }
       
     </style>
@@ -59,7 +71,20 @@
         </div>
         <button v-on:click="reset" class="secondary">Play again!</button>
     </div>
+
+
+    <div id="error" v-if="errorDivVisible">
+        <dialog open>
+          <article>
+              <p>
+              Unknown network error ... try refreshing
+              </p>
+          </article>
+        </dialog>
+    </div>
+
 </div>
+<footer>From the genius mind of <a href="https://yashmehrotra.com/">Yash Mehrotra</a></footer>
 </main>
 
 <script>
@@ -69,6 +94,7 @@ var app = new Vue({
     inputVisible: true,
     resultVisible: false,
     progressVisible: false,
+    errorDivVisible: false,
     userHand: '',
     aiHand: '',
   },
@@ -76,27 +102,37 @@ var app = new Vue({
     choose: async function() {
       this.inputVisible = false;
       this.userHand = event.target.getAttribute('data-id');
+
       // Show progress bar
       this.progressVisible = true;
 
+      var handleError = function (err) {
+        console.warn(err);
+        return new Response(JSON.stringify({
+            code: 504,
+        }));
+      };
+
       Promise.all([
-        fetch('http://localhost:8000/compute', {
+        fetch('https://api-rock-paper-scissor.yashmehrotra.com/compute', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({'session_id': 100, 'hand': this.userHand})
-        }),
-        new Promise(resolve => setTimeout(resolve, 1000))
+          body: JSON.stringify({'session_id': Math.floor(Math.random() * 100000), 'hand': this.userHand})
+        }).catch(handleError),
+        new Promise(resolve => setTimeout(resolve, 500))
       ]).then(async (values) => {
         const result = await values[0].json();
-        this.progressVisible = false;
+        if (result.code === 504) {
+          console.log("Unknown network error");
+          this.errorDivVisible = true;
+        }
         console.log(result);
+
+        this.progressVisible = false;
         this.aiHand = this.capitalizeFirstLetter(result['ai_hand']);
-        // Hide progress bar
         this.resultVisible = true;
       });
     
-      // TODO: Error handling
-      // if not 200, show error
     },
     capitalizeFirstLetter: function(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
