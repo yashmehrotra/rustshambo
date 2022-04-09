@@ -2,6 +2,8 @@
 
 An unbeatable rock-paper-scissor bot written in Rust with a UI made with Vue.js
 
+You can play at: https://rock-paper-scissor.yashmehrotra.com
+
 ### Setup
 
 ```
