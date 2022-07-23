@@ -7,11 +7,6 @@ You can play at: https://rock-paper-scissor.yashmehrotra.com
 ### Setup
 
 ```
-# API
-ROCKET_ENV=prod cargo run
-
-# Web
-cd frontend && python -m http.server
+# Creating a static binary to ship a smaller docker image
+RUSTFLAGS="-C target-feature=+crt-static" cargo build --release --target x86_64-unknown-linux-gnu
 ```
-
-Note: Remember to change the API URL in `frontend/index.html`
