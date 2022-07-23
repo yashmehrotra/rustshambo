@@ -1,14 +1,7 @@
-API_IMG := yashmehrotra/rustshambo-api:latest
-WEB_IMG := yashmehrotra/rustshambo-web:latest
+IMG := yashmehrotra/rustshambo:latest
 
-docker-build-api:
-	docker build -t ${API_IMG} .
+docker-build:
+	docker build -t ${IMG} .
 
-docker-push-api:
-	docker push ${API_IMG}
-
-docker-build-web:
-	cd frontend && docker build -t ${WEB_IMG} .
-
-docker-push-web:
-	docker push ${WEB_IMG}
+docker-push:
+	docker push ${IMG}
